@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para El Amor De Mi Vida</title>
+    <style>
+        :root {
+            --bg-color: #fff9fa;
+            --primary-color: #e63946;
+            --text-color: #2b2d42;
+            --accent-color: #ffccd5;
+            --card-bg: rgba(255, 255, 255, 0.75);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            scroll-behavior: smooth;
+        }
+
+        /* 1. Pantalla de Carga */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #121212;
+            color: #ffccd5;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 280px;
+            height: 12px;
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+            animation: fillUp 4s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        /* 2. Contenido Principal */
+        .main-content {
+            opacity: 0;
+            display: none;
+            transition: opacity 1.2s ease;
+        }
+
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at top, #fff0f3 0%, #ffccd5 100%);
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            font-style: italic;
+            opacity: 0.9;
+            padding: 0 10px;
+        }
+
+        .counter-container {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            max-width: 90%;
+            box-sizing: border-box;
+        }
+
+        #contador {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #c32f3a;
+            line-height: 1.4;
+        }
+
+        section {
+            padding: 80px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(230, 57, 70, 0.05);
+            width: 260px;
+            box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .badge-status {
+            background-color: #ffb5a7;
+            color: #d9383a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .gallery {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 15px 15px 25px 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-radius: 4px;
+            transform: rotate(-2deg);
+            transition: all 0.3s ease;
+            width: 220px;
+            box-sizing: border-box;
+        }
+
+        .polaroid:nth-child(even) {
+            transform: rotate(3deg);
+        }
+
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 0 15px 35px rgba(230, 57, 70, 0.15);
+            z-index: 10;
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 2px;
+            display: block;
+        }
+
+        .polaroid p {
+            margin: 15px 0 0 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
+
+        #galeria-oculta {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 1.5s cubic-bezier(0, 1, 0, 1);
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        #galeria-oculta.abierta {
+            max-height: 50000px; 
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        .btn-ver-mas {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-mas:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-love {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #b5179e 100%);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .subtitle { font-size: 1.1rem; }
+            section { padding: 50px 15px; }
+            .card { width: 100%; max-width: 320px; }
+            .polaroid { width: 100%; max-width: 280px; }
+            #contador { font-size: 1rem; }
+        }
+
+        @keyframes fillUp {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .heart {
+            position: fixed;
+            font-size: 28px;
+            color: var(--primary-color);
+            pointer-events: none;
+            animation: floatUp 3.5s linear forwards;
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg) scale(0); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1.4); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <h2 style="letter-spacing: 2px; font-size: 1.1rem; color: #fff; margin-bottom: 5px;">REINICIANDO SISTEMA DE AMOR...</h2>
+        <p id="status-text" style="color: #ffccd5; opacity: 0.8; font-size: 0.85rem; height: 20px; font-family: monospace;">Buscando registros...</p>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+
+    <div class="main-content" id="content">
+        <header>
+            <h1>¡He vuelto! ❤️</h1>
+            <p class="subtitle">Para mi niña de cristal, mi Masha, mi vida entera...</p>
+            
+            <div class="counter-container">
+                <p style="margin: 0 0 5px 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #747d8c;">Tiempo total en el sistema:</p>
+                <div id="contador">Calculando...</div>
+            </div>
+
+            <p style="max-width: 520px; line-height: 1.7; font-size: 1.1rem; opacity: 0.8; margin-top: 10px; padding: 0 15px; box-sizing: border-box;">
+                Extrañaba recordarle lo mucho que la amo de la forma que mejor sé hacer: diseñando un espacio que sea completamente para usted.
+            </p>
+            <a href="#historial" style="text-decoration: none; color: var(--primary-color); font-weight: bold; margin-top: 30px; border-bottom: 2px solid var(--primary-color); padding-bottom: 4px; display: inline-block;">Ver el Roadmap ↓</a>
+        </header>
+
+        <section style="padding: 40px 20px;">
+            <h2>Nuestra Música 🎵</h2>
+            <div style="max-width: 500px; margin: 0 auto; box-shadow: 0 8px 24px rgba(0,0,0,0.1); border-radius:12px; overflow:hidden;">
+                <iframe src="https://open.spotify.com/embed/playlist/2QEntO1fP0xfHd4KjCpLWb?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+        </section>
+
+        <section id="historial">
+            <h2>Historial de Actualizaciones</h2>
+            <div class="card-container">
+                <div class="card">
+                    <h3>🛠️ Bug Corregido</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5; opacity: 0.9;">Se eliminó por completo el error de pasar días sin recordarle de forma especial que usted es mi Luna.</p>
+                </div>
+                <div class="card">
+                    <span class="badge-status">Estado: Versión Beta</span>
+                    <h3>⚡ Rendimiento</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5; opacity: 0.9;">Se estuvo trabajando fuertemente en la <b>Versión Alfa</b> reconstruyendo todo desde adentro. Actualmente hemos avanzado a la <b>Versión Beta</b> para pulir cada detalle.</p>
+                </div>
+                <div class="card">
+                    <h3>✨ Nueva Interfaz</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5; opacity: 0.9;">Un espacio renovado, más limpio y seguro, donde usted siempre seguiría siendo la única protagonista.</p>
+                </div>
+            </div>
+        </section>
+
+        <section style="background-color: #fff0f3;">
+            <h2>Nuestros Momentos Favoritos</h2>
+            <p style="opacity: 0.7; margin-bottom: 30px;">Recuerdos de lo que me inspira a seguir construyendo esto para usted.</p>
+            
+            <div class="gallery">
+                <div class="polaroid">
+                    <img src="foto-1.jpg" onerror="this.onerror=null; this.src='foto-1.png';" alt="Foto 1">
+                    <p>Mi niña de cristal ✨</p>
+                </div>
+                <div class="polaroid">
+                    <img src="foto-2.jpg" onerror="this.onerror=null; this.src='foto-2.png';" alt="Foto 2">
+                    <p>Mi vida entera ❤️</p>
+                </div>
+                <div class="polaroid">
+                    <img src="foto-3.jpg" onerror="this.src='foto-3.png'" alt="Foto 3">
+                    <p>Mi Moon 🌙</p>
+                </div>
+                <div class="polaroid">
+                    <img src="foto-4.jpg" onerror="this.onerror=null; this.src='foto-4.png';" alt="Foto 4">
+                    <p>You were out of my league 💜</p>
+                </div>
+                <div class="polaroid">
+                    <img src="foto-5.jpg" onerror="this.onerror=null; this.src='foto-5.png';" alt="Foto 5">
+                    <p>Cada segundo cuenta ⏳</p>
+                </div>
+                <div class="polaroid">
+                    <img src="foto-6.jpg" onerror="this.onerror=null; this.src='foto-6.png';" alt="Foto 6">
+                    <p>Mi lugar favorito en el mundo 🔗</p>
+                </div>
+            </div>
+
+            <div id="galeria-oculta"></div>
+
+            <button class="btn-ver-mas" id="btnToggleGaleria" onclick="toggleGaleria()">Ver galería completa (74 recuerdos)</button>
+        </section>
+
+        <section style="background: linear-gradient(135deg, #fff0f3 0%, #ffe5ec 100%); border-radius: 30px; padding: 60px 40px; box-shadow: inset 0 0 20px rgba(255,255,255,0.5); margin: 0 auto 40px auto; max-width: 850px; box-sizing: border-box;">
+            <h2 style="color: var(--primary-color);">Un mensaje desde el corazón</h2>
+            <p style="font-size: 1.25rem; line-height: 1.8; max-width: 650px; margin: 0 auto; font-style: italic; opacity: 0.9;">
+                "Hola, mi Moon. Sé que dejé de hacer estas páginas por un tiempo, pero mi amor por usted jamás se detuvo. Hoy vuelvo a este rincón virtual porque usted se merece que la presuman, que la amen y que le recuerden lo valiosa que es."
+            </p>
+        </section>
+
+        <section style="padding-bottom: 100px;">
+            <h2>¿Me extrañó un poquito?</h2>
+            <a href="https://wa.me/50237989761?text=Hola%20Mar%20%F0%9F%8C%8A%3A%20" target="_blank" class="btn-love" onclick="lanzarCorazones()">¡Presione aquí! ❤️</a>
+        </section>
+    </div>
+
+    <script>
+        const frasesOriginales = [
+            "You were out of my league 💜",
+            "Usted y yo contra el mundo 🕊️",
+            "Su sonrisa lo cambia todo ✨",
+            "Mi rincón feliz en la galaxia 🌌",
+            "Coleccionando instantes a su lado 📸",
+            "El mejor capítulo de mi vida 📖",
+            "Mi Luna favorita 🌙",
+            "Usted es mi hogar con latidos 💖",
+            "De esos días que no se olvidan 🥰"
+        ];
+
+        // SCRIPT ULTRA-SEGURO: Intenta JPG, si falla intenta PNG, si falla intenta WEBP
+        const contenedorOculto = document.getElementById('galeria-oculta');
+        for (let i = 7; i <= 74; i++) {
+            const div = document.createElement('div');
+            div.className = 'polaroid';
+            const fraseAleatoria = frasesOriginales[Math.floor(Math.random() * frasesOriginales.length)];
+            
+            div.innerHTML = `
+                <img src="foto-${i}.jpg" 
+                     onerror="this.onerror=null; this.src='foto-${i}.png'; this.setAttribute('data-retry', 'webp');" 
+                     alt="Foto ${i}">
+                <p>${fraseAleatoria}</p>
+            `;
+            contenedorOculto.appendChild(div);
+        }
+
+        // Manejador secundario por si falla el PNG e intenta WEBP como último recurso
+        document.addEventListener('error', function (e) {
+            if (e.target.tagName === 'IMG' && e.target.getAttribute('data-retry') === 'webp') {
+                const src = e.target.src;
+                if(src.endsWith('.png')) {
+                    e.target.removeAttribute('data-retry');
+                    e.target.src = src.replace('.png', '.webp');
+                }
+            }
+        }, true);
+
+        // CONTADOR
+        const fechaInicio = new Date(2024, 8, 24).getTime(); 
+        function actualizarContador() {
+            const ahora = new Date().getTime();
+            const diferencia = ahora - fechaInicio;
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+            document.getElementById("contador").innerHTML = `${dias} días, ${horas} horas, ${minutes} minutos y ${segundos} segundos.`;
+        }
+        setInterval(actualizarContador, 1000);
+
+        function toggleGaleria() {
+            const galeria = document.getElementById('galeria-oculta');
+            const boton = document.getElementById('btnToggleGaleria');
+            if(galeria.classList.contains('abierta')) {
+                galeria.classList.remove('abierta');
+                boton.innerText = 'Ver galería completa (74 recuerdos)';
+            } else {
+                galeria.classList.add('abierta');
+                boton.innerText = 'Contraer baúl de fotos ↑';
+            }
+        }
+
+        // SISTEMA DE TEXTOS DE LA PANTALLA DE CARGA
+        const mensajesCarga = [
+            "Optimizando base de mimos para mi Masha...",
+            "Cargando toneladas de amor para mi niña de cristal...",
+            "Inicializando interfaz romántica v2.5...",
+            "Conectando recuerdos compartidos...",
+            "¡Sistema listo! Abriendo mi corazón..."
+        ];
+        
+        let msgIdx = 0;
+        const intervalCarga = setInterval(() => {
+            if(msgIdx < mensajesCarga.length) {
+                document.getElementById('status-text').innerText = mensajesCarga[msgIdx];
+                msgIdx++;
+            }
+        }, 700);
+
+        setTimeout(() => {
+            clearInterval(intervalCarga);
+            document.getElementById('loading-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                actualizarContador();
+                setTimeout(() => { document.getElementById('content').style.opacity = '1'; }, 50);
+            }, 1000);
+        }, 3800);
+
+        function lanzarCorazones() {
+            for (let i = 0; i < 18; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart'; heart.innerHTML = '❤️';
+                    heart.style.left = (Math.random() * 90 + 5) + 'vw';
+                    heart.style.animationDuration = (Math.random() * 1.5 + 2) + 's';
+                    document.body.appendChild(heart);
+                    setTimeout(() => { heart.remove(); }, 3500);
+                }, i * 120);
+            }
+        }
+    </script>
+</body>
+</html>
